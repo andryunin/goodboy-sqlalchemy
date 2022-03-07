@@ -1,0 +1,20 @@
+# Byte-compiled and built packages
+*.py[cod]
+dist/
+
+# Virtual environment 
+.venv
+
+# Unit test / coverage reports
+.coverage
+
+# Sphinx documentation
+docs/_build/
+
+# I18n
+src/goodboy_sqlalchemy/locale/**/goodboy.mo
+
+# Editors and notes
+.vscode/*
+.idea/*
+.notes
