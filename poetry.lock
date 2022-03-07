@@ -54,6 +54,17 @@ tomli = {version = "*", optional = true, markers = "extra == \"toml\""}
 toml = ["tomli"]
 
 [[package]]
+name = "goodboy"
+version = "0.2.0"
+description = "Data validation tool"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[package.dependencies]
+typing-extensions = {version = ">=4.0", markers = "python_version >= \"3.6\" and python_version < \"3.8\""}
+
+[[package]]
 name = "importlib-metadata"
 version = "4.11.2"
 description = "Read metadata from Python packages"
@@ -241,7 +252,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "d7086d35181bf73d9bc3eb0de97bf6390d952d066f76f000f94ce8692d6a003c"
+content-hash = "672feef4bc497f145133902cab967ec09b4fde279ebc324df67457ae88098faa"
 
 [metadata.files]
 atomicwrites = [
@@ -302,6 +313,10 @@ coverage = [
     {file = "coverage-6.3.2-cp39-cp39-win_amd64.whl", hash = "sha256:9548f10d8be799551eb3a9c74bbf2b4934ddb330e08a73320123c07f95cc2d92"},
     {file = "coverage-6.3.2-pp36.pp37.pp38-none-any.whl", hash = "sha256:18d520c6860515a771708937d2f78f63cc47ab3b80cb78e86573b0a760161faf"},
     {file = "coverage-6.3.2.tar.gz", hash = "sha256:03e2a7826086b91ef345ff18742ee9fc47a6839ccd517061ef8fa1976e652ce9"},
+]
+goodboy = [
+    {file = "goodboy-0.2.0-py3-none-any.whl", hash = "sha256:ac028eb2b2504ed8e5afbd4d0f7eeb379a2871d3228e943d4a2b7eaf5d29c15c"},
+    {file = "goodboy-0.2.0.tar.gz", hash = "sha256:1104c57900b7df63999082fef69b8e871f10397807d882d0fb58f9d381a01344"},
 ]
 importlib-metadata = [
     {file = "importlib_metadata-4.11.2-py3-none-any.whl", hash = "sha256:d16e8c1deb60de41b8e8ed21c1a7b947b0bc62fab7e1d470bcdf331cea2e6735"},
