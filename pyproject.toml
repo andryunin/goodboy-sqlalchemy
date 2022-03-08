@@ -10,6 +10,7 @@ readme = "README.md"
 python = "^3.7"
 typing-extensions = { version=">=4.0", python=">=3.6,<3.8" }
 goodboy = "^0.2"
+sqlalchemy = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
