@@ -28,6 +28,7 @@ class StringColumnSchemaFactory(ColumnSchemaFactory):
 
 TYPE_TO_SCHEMA_FACTORY_MAPPING: dict[Any, ColumnSchemaFactory] = {
     sa.Integer: SimpleColumnSchemaFactory(gb.Int),
+    sa.Date: SimpleColumnSchemaFactory(gb.Date),
     sa.String: StringColumnSchemaFactory(),
 }
 
@@ -49,9 +50,7 @@ class SchemaBuilder:
             if isinstance(column.type, sa_type):
                 return gb_schema_factory
 
-        raise SchemaBuilderError(
-            f"unmapped SQLAlchemy column type {repr(column.type)}"
-        )
+        raise SchemaBuilderError(f"unmapped SQLAlchemy column type {repr(column.type)}")
 
 
 builder = SchemaBuilder(TYPE_TO_SCHEMA_FACTORY_MAPPING)
