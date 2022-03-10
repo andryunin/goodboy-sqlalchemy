@@ -59,10 +59,17 @@ version = "0.2.0"
 description = "Data validation tool"
 category = "main"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = "^3.7"
+develop = false
 
 [package.dependencies]
 typing-extensions = {version = ">=4.0", markers = "python_version >= \"3.6\" and python_version < \"3.8\""}
+
+[package.source]
+type = "git"
+url = "https://github.com/andryunin/goodboy"
+reference = "main"
+resolved_reference = "0088f4e5833fc22bf0fee02ee0a1c80a13f72909"
 
 [[package]]
 name = "greenlet"
@@ -296,7 +303,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "65eee2cdee8cd5f543423d9874203d7ba80871d1f8262bd6f85b7b5b134cc16f"
+content-hash = "9eecc369587d47d709d61561bb1cd027d09031d40515f19aa39f660d59ca5edf"
 
 [metadata.files]
 atomicwrites = [
@@ -358,10 +365,7 @@ coverage = [
     {file = "coverage-6.3.2-pp36.pp37.pp38-none-any.whl", hash = "sha256:18d520c6860515a771708937d2f78f63cc47ab3b80cb78e86573b0a760161faf"},
     {file = "coverage-6.3.2.tar.gz", hash = "sha256:03e2a7826086b91ef345ff18742ee9fc47a6839ccd517061ef8fa1976e652ce9"},
 ]
-goodboy = [
-    {file = "goodboy-0.2.0-py3-none-any.whl", hash = "sha256:ac028eb2b2504ed8e5afbd4d0f7eeb379a2871d3228e943d4a2b7eaf5d29c15c"},
-    {file = "goodboy-0.2.0.tar.gz", hash = "sha256:1104c57900b7df63999082fef69b8e871f10397807d882d0fb58f9d381a01344"},
-]
+goodboy = []
 greenlet = [
     {file = "greenlet-1.1.2-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:58df5c2a0e293bf665a51f8a100d3e9956febfbf1d9aaf8c0677cf70218910c6"},
     {file = "greenlet-1.1.2-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:aec52725173bd3a7b56fe91bc56eccb26fbdff1386ef123abb63c84c5b43b63a"},

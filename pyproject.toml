@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.7"
 typing-extensions = { version=">=4.0", python=">=3.6,<3.8" }
-goodboy = "^0.2"
+goodboy = {git = "https://github.com/andryunin/goodboy", rev = "main"}
 sqlalchemy = "*"
 
 [tool.poetry.dev-dependencies]
