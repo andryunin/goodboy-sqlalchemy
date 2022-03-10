@@ -31,7 +31,7 @@ class ColumnBuilder:
 
     def build(self, sa_column: SAColumn):
         schema = self._schema_builder.build(sa_column)
-        return Column(sa_column.name, schema, required=sa_column.nullable)
+        return Column(sa_column.name, schema, required=not sa_column.nullable)
 
 
 column_builder = ColumnBuilder(schema_builder)
