@@ -4,9 +4,9 @@ import goodboy as gb
 import pytest
 import sqlalchemy as sa
 
-from goodboy_sqlalchemy.schemas import (
-    SchemaBuilder,
-    SchemaBuilderError,
+from goodboy_sqlalchemy.column_schemas import (
+    ColumnSchemaBuilder,
+    ColumnSchemaBuilderError,
     SimpleColumnSchemaFactory,
     StringColumnSchemaFactory,
 )
@@ -43,9 +43,7 @@ def test_schema_builder_when_type_mapped():
     schema_factory = Mock()
     schema_factory.build = Mock(return_value=schema)
 
-    builder = SchemaBuilder({
-        sa.Integer: schema_factory
-    })
+    builder = ColumnSchemaBuilder({sa.Integer: schema_factory})
 
     assert builder.build(column) is schema
     schema_factory.build.assert_called_once_with(column)
@@ -53,7 +51,7 @@ def test_schema_builder_when_type_mapped():
 
 def test_schema_builder_when_type_unmapped():
     column = sa.Column("dummy", sa.Integer, nullable=False)
-    builder = SchemaBuilder({})
+    builder = ColumnSchemaBuilder({})
 
-    with pytest.raises(SchemaBuilderError):
+    with pytest.raises(ColumnSchemaBuilderError):
         assert builder.build(column)
