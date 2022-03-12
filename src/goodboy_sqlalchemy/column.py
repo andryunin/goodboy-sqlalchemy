@@ -121,22 +121,44 @@ class MappedColumn:
         return gb.Error(code, args, nested_errors, self._messages.get_message(code))
 
 
+class MappedColumnBuilderError(Exception):
+    pass
+
+
 class MappedColumnBuilder:
     def build(
         self,
         sa_mapped_class: type,
-        sa_column: sa.Column,
-        sa_pk_column: sa.Column,
         column: Column,
         messages: gb.MessageCollectionType = DEFAULT_MESSAGES,
     ) -> Column:
         return MappedColumn(
             sa_mapped_class,
-            sa_column,
-            sa_pk_column,
+            self._get_sa_column(sa_mapped_class, column.name),
+            self._get_pk_sa_column(sa_mapped_class),
             column,
             messages,
         )
+
+    def _get_sa_column(self, sa_mapped_class: type, column_name: str) -> sa.Column:
+        sa_mapper = sa.inspect(sa_mapped_class)
+
+        if column_name not in sa_mapper.columns:
+            raise MappedColumnBuilderError(
+                f"mapped class {sa_mapped_class.__name__} has no column {column_name}"
+            )
+
+        return sa_mapper.columns[column_name]
+
+    def _get_pk_sa_column(self, sa_mapped_class: type) -> sa.Column:
+        sa_mapper = sa.inspect(sa_mapped_class)
+
+        if len(sa_mapper.primary_key) > 1:
+            raise MappedColumnBuilderError(
+                "mapped classes with composite primary keys are not supported"
+            )
+
+        return sa_mapper.primary_key[0]
 
 
 mapped_column_builder = MappedColumnBuilder()
