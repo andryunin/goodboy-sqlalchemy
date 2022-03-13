@@ -2,7 +2,8 @@ import pytest
 import sqlalchemy as sa
 from goodboy import Error, Str
 
-from goodboy_sqlalchemy.column import Column, MappedColumn
+from goodboy_sqlalchemy.column import Column
+from goodboy_sqlalchemy.mapped_key import MappedColumnKey
 from tests.conftest import assert_errors
 
 # Use in-memory SQLite
@@ -37,7 +38,7 @@ def test_inherits_column_properties():
 
     column = Column(name, Str(), required=required, predicate=lambda _: predicate_res)
 
-    mapped_column = MappedColumn(Dummy, Dummy.name, Dummy.id, column)
+    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
 
     assert mapped_column.name is name
     assert mapped_column.required is required
@@ -46,7 +47,7 @@ def test_inherits_column_properties():
 
 def test_accepts_unique_value(session):
     column = Column("name", Str(), required=True, unique=True)
-    mapped_column = MappedColumn(Dummy, Dummy.name, Dummy.id, column)
+    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
 
     assert mapped_column.validate("ok", False, {}, session) == "ok"
 
@@ -56,7 +57,7 @@ def test_rejects_non_unique_value_of_new_mapped_instance(session):
     session.flush()
 
     column = Column("name", Str(), required=True, unique=True)
-    mapped_column = MappedColumn(Dummy, Dummy.name, Dummy.id, column)
+    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
 
     with assert_errors([Error("already_exists")]):
         mapped_column.validate("old", False, {}, session)
@@ -68,6 +69,6 @@ def test_accepts_non_unique_value_of_old_mapped_instance(session):
     session.flush()
 
     column = Column("name", Str(), required=True, unique=True)
-    mapped_column = MappedColumn(Dummy, Dummy.name, Dummy.id, column)
+    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
 
     assert mapped_column.validate("old", False, {}, session, dummy) == "old"
