@@ -10,7 +10,7 @@ from goodboy_sqlalchemy.column_schemas import ColumnSchemaBuilder, column_schema
 from goodboy_sqlalchemy.messages import DEFAULT_MESSAGES
 
 
-class Column:
+class Column(gb.Key):
     def __init__(
         self,
         name: str,
@@ -20,23 +20,17 @@ class Column:
         predicate: Optional[Callable[[dict], bool]] = None,
         unique: bool = False,
     ):
-        self.required = required
-        self.name = name
+        super().__init__(name, schema, required=required, predicate=predicate)
         self.unique = unique
-        self._schema = schema
-        self._predicate = predicate
 
-    def predicate_result(self, prev_values: dict):
-        if self._predicate:
-            return self._predicate(prev_values)
-        else:
-            return True
-
-    def validate(self, value, typecast: bool = False, context: dict = {}):
-        if self._schema:
-            return self._schema(value, typecast=typecast, context=context)
-        else:
-            return value
+    def with_predicate(self, predicate: Callable[[dict], bool]) -> Column:
+        return Column(
+            self.name,
+            self._schema,
+            required=self.required,
+            predicate=predicate,
+            unique=self.unique,
+        )
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
