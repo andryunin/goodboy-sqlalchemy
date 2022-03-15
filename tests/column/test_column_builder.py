@@ -1,46 +1,35 @@
-from unittest.mock import Mock
+import goodboy as gb
+import pytest
+import sqlalchemy as sa
+import sqlalchemy.orm as sa_orm
 
-from goodboy import Int
-from sqlalchemy import Column as SAColumn
-from sqlalchemy import Integer
-
-from goodboy_sqlalchemy.column import ColumnBuilder
+from goodboy_sqlalchemy.column import Column, ColumnBuilder, ColumnBuilderError
 from goodboy_sqlalchemy.column_schemas import column_schema_builder
 
-
-def test_built_column_name():
-    builder = ColumnBuilder(column_schema_builder)
-    column = SAColumn("dummy", Integer)
-    assert builder.build(column).name == "dummy"
+Base = sa.orm.declarative_base()
 
 
-def test_built_column_required_flag():
-    builder = ColumnBuilder(column_schema_builder)
+class Dummy(Base):
+    __tablename__ = "dummies"
 
-    sa_column_nullable = SAColumn(Integer, nullable=True)
-    sa_column_not_nullable = SAColumn(Integer, nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
 
-    assert not builder.build(sa_column_nullable).required
-    assert builder.build(sa_column_not_nullable).required
-
-
-def test_built_column_unique_flag():
-    builder = ColumnBuilder(column_schema_builder)
-
-    sa_column_unique = SAColumn(Integer, unique=True)
-    sa_column_not_unique = SAColumn(Integer, unique=False)
-
-    assert builder.build(sa_column_unique).unique
-    assert not builder.build(sa_column_not_unique).unique
+    field_1 = sa.Column(sa.String, nullable=False, unique=True)
+    field_2 = sa.Column(sa.String)
 
 
-def test_column_schema_builder_is_used():
-    column_schema_builder_mock = Mock()
-    column_schema_builder_mock.build = Mock()
+@pytest.fixture
+def column_builder():
+    return ColumnBuilder(column_schema_builder)
 
-    column = SAColumn("dummy", Integer)
 
-    builder = ColumnBuilder(column_schema_builder_mock)
-    builder.build(column)
+def test_builds_columns(column_builder: ColumnBuilder):
+    assert column_builder.build(Dummy, ["field_1", "field_2"]) == [
+        Column("field_1", gb.Str(), required=True, unique=True),
+        Column("field_2", gb.Str(allow_none=True), required=False, unique=False),
+    ]
 
-    column_schema_builder_mock.build.assert_called_once_with(column)
+
+def test_raises_error_when_column_not_found(column_builder: ColumnBuilder):
+    with pytest.raises(ColumnBuilderError):
+        column_builder.build(Dummy, ["unknown_field"])

@@ -45,14 +45,29 @@ class ColumnBuilder:
     def __init__(self, column_schema_builder: ColumnSchemaBuilder):
         self._column_schema_builder = column_schema_builder
 
-    def build(self, sa_column: sa.Column) -> Column:
+    def build(self, sa_mapped_class: type, column_names: list[str]) -> list[Column]:
+        sa_mapper = sa.inspect(sa_mapped_class)
+        result: list[Column] = []
+
+        for column_name in column_names:
+            result.append(self._build_column(sa_mapper, column_name))
+
+        return result
+
+    def _build_column(self, sa_mapper, column_name: str) -> Column:
+        if column_name not in sa_mapper.columns:
+            raise ColumnBuilderError(
+                f"mapped class {sa_mapper.class_.__name__} has no column {column_name}"
+            )
+
+        sa_column = sa_mapper.columns[column_name]
         schema = self._column_schema_builder.build(sa_column)
 
         return Column(
             sa_column.name,
             schema,
             required=not sa_column.nullable,
-            unique=sa_column.unique,
+            unique=sa_column.unique or False,
         )
 
 
