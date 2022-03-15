@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod, abstractproperty
 from typing import Any, Optional
 
@@ -127,8 +129,18 @@ class MappedKeyBuilder:
     def build(
         self,
         sa_mapped_class: type,
-        key: gb.Key,
+        keys: list[gb.Key],
         messages: gb.MessageCollectionType = DEFAULT_MESSAGES,
+    ) -> list[MappedKey]:
+        result: list[MappedKey] = []
+
+        for key in keys:
+            result.append(self._build_mapped_key(sa_mapped_class, key, messages))
+
+        return result
+
+    def _build_mapped_key(
+        self, sa_mapped_class: type, key: gb.Key, messages: gb.MessageCollectionType
     ) -> MappedKey:
         if isinstance(key, Column):
             return MappedColumnKey(

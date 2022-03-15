@@ -18,28 +18,44 @@ class Dummy(Base):
     __tablename__ = "dummies"
 
     id = sa.Column(sa.Integer, primary_key=True)
-    name = sa.Column(sa.String)
+
+    field_1 = sa.Column(sa.String, nullable=False, unique=True)
+    field_2 = sa.Column(sa.String)
 
 
-def test_builds_mapped_sa_column():
-    column = Column("name", gb.Str())
-    builder = MappedKeyBuilder()
-
-    assert builder.build(Dummy, column) == MappedColumnKey(
-        Dummy, Dummy.name, Dummy.id, column, DEFAULT_MESSAGES
-    )
+@pytest.fixture
+def mapped_key_builder():
+    return MappedKeyBuilder()
 
 
-def test_raises_error_when_sa_column_not_found():
-    column = Column("unknown", gb.Str())
-    builder = MappedKeyBuilder()
+def test_builds_mapped_column_keys(mapped_key_builder: MappedKeyBuilder):
+    keys = [
+        Column("field_1", gb.Str(), required=True, unique=True),
+        Column("field_2", gb.Str(allow_none=True), required=False, unique=False),
+    ]
+
+    assert mapped_key_builder.build(Dummy, keys) == [
+        MappedColumnKey(Dummy, Dummy.field_1, Dummy.id, keys[0], DEFAULT_MESSAGES),
+        MappedColumnKey(Dummy, Dummy.field_2, Dummy.id, keys[1], DEFAULT_MESSAGES),
+    ]
+
+
+def test_raises_error_when_column_not_found(mapped_key_builder: MappedKeyBuilder):
+    keys = [
+        Column("unknown_field", gb.Str()),
+    ]
 
     with pytest.raises(MappedKeyBuilderError):
-        builder.build(Dummy, column)
+        mapped_key_builder.build(Dummy, keys)
 
 
-def test_mapped_key_building():
-    key = gb.Key("name", gb.Str())
-    builder = MappedKeyBuilder()
+def test_builds_mapped_property_keys(mapped_key_builder: MappedKeyBuilder):
+    keys = [
+        gb.Key("property_1"),
+        gb.Key("property_2"),
+    ]
 
-    assert builder.build(Dummy, key) == MappedPropertyKey(key)
+    assert mapped_key_builder.build(Dummy, keys) == [
+        MappedPropertyKey(keys[0]),
+        MappedPropertyKey(keys[1]),
+    ]
