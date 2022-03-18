@@ -11,6 +11,49 @@ from goodboy_sqlalchemy.mapped_key import MappedKeyBuilder, mapped_key_builder
 from goodboy_sqlalchemy.messages import DEFAULT_MESSAGES
 
 
+class MappedInstanceProxyKeyError(Exception):
+    """
+    Exception used in MappedInstanceProxy instead of standard KeyError, to avoid
+    accidental catching KeyError exception from an mapped instance property.
+    """
+
+    pass
+
+
+class MappedInstanceProxy:
+    def __init__(self, mapped_instance, key_names: list[str], override_values: dict):
+        self._mapped_instance = mapped_instance
+        self._key_names = key_names
+        self._override_values = override_values
+
+    def get(self, key, default=None):
+        try:
+            return self._getitem(key, default)
+        except MappedInstanceProxyKeyError:
+            return default
+
+    def __contains__(self, key):
+        return key in self._key_names
+
+    def __getitem__(self, key):
+        try:
+            return self._getitem(key, None)
+        except MappedInstanceProxyKeyError:
+            raise KeyError(key)
+
+    def _getitem(self, key, default):
+        if key not in self._key_names:
+            raise MappedInstanceProxyKeyError()
+
+        if key in self._override_values:
+            return self._override_values[key]
+
+        if self._mapped_instance:
+            return getattr(self._mapped_instance, key, default)
+
+        return default
+
+
 class MappedError(Exception):
     pass
 
