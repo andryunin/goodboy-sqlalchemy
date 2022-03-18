@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, Optional
 
 import goodboy as gb
-import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
 
 from goodboy_sqlalchemy.column import ColumnBuilder, column_builder

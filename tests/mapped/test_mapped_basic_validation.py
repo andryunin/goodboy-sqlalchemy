@@ -4,9 +4,7 @@ import goodboy as gb
 import pytest
 import sqlalchemy as sa
 
-from goodboy_sqlalchemy.column import Column
 from goodboy_sqlalchemy.mapped import Mapped
-from goodboy_sqlalchemy.messages import DEFAULT_MESSAGES
 from tests.conftest import (
     assert_dict_key_errors,
     assert_dict_value_errors,

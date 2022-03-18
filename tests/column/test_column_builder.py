@@ -1,7 +1,6 @@
 import goodboy as gb
 import pytest
 import sqlalchemy as sa
-import sqlalchemy.orm as sa_orm
 
 from goodboy_sqlalchemy.column import Column, ColumnBuilder, ColumnBuilderError
 from goodboy_sqlalchemy.column_schemas import column_schema_builder
