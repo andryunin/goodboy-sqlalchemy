@@ -96,6 +96,9 @@ class Mapped(gb.Schema, gb.SchemaErrorMixin):
 
         errors: list[gb.Error] = []
 
+        for key_name in unknown_keys:
+            key_errors[key_name] = [self._error("unknown_key")]
+
         if key_errors:
             errors.append(self._error("key_errors", nested_errors=key_errors))
 
