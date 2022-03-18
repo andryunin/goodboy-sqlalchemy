@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Mapping, Optional
 
 import goodboy as gb
 import sqlalchemy.orm as sa_orm
@@ -19,7 +19,7 @@ class MappedInstanceProxyKeyError(Exception):
     pass
 
 
-class MappedInstanceProxy:
+class MappedInstanceProxy(Mapping[str, Any]):
     def __init__(self, mapped_instance, key_names: list[str], override_values: dict):
         self._mapped_instance = mapped_instance
         self._key_names = key_names
@@ -39,6 +39,12 @@ class MappedInstanceProxy:
             return self._getitem(key, None)
         except MappedInstanceProxyKeyError:
             raise KeyError(key)
+
+    def __len__(self):
+        return len(self._key_names)
+
+    def __iter__(self):
+        return iter(self._key_names)
 
     def _getitem(self, key, default):
         if key not in self._key_names:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod, abstractproperty
-from typing import Any, Optional
+from typing import Any, Mapping, Optional
 
 import goodboy as gb
 import sqlalchemy as sa
@@ -18,6 +18,10 @@ class MappedKey(ABC):
 
     @abstractproperty
     def required(self):
+        ...
+
+    @abstractmethod
+    def predicate_result(self, prev_values: Mapping[str, Any]) -> bool:
         ...
 
     @abstractmethod
@@ -55,7 +59,7 @@ class MappedColumnKey(MappedKey):
     def required(self):
         return self._column.required
 
-    def predicate_result(self, prev_values: dict):
+    def predicate_result(self, prev_values: Mapping[str, Any]) -> bool:
         return self._column.predicate_result(prev_values)
 
     def validate(
@@ -104,7 +108,7 @@ class MappedPropertyKey(MappedKey):
     def required(self):
         return self._key.required
 
-    def predicate_result(self, prev_values: dict):
+    def predicate_result(self, prev_values: Mapping[str, Any]) -> bool:
         return self._key.predicate_result(prev_values)
 
     def validate(
