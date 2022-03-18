@@ -104,6 +104,9 @@ class MappedPropertyKey(MappedKey):
     def required(self):
         return self._key.required
 
+    def predicate_result(self, prev_values: dict):
+        return self._key.predicate_result(prev_values)
+
     def validate(
         self,
         value,
