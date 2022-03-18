@@ -5,6 +5,7 @@ from typing import Any, Optional, Type
 
 import goodboy as gb
 import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as sa_pg
 
 
 class ColumnSchemaFactory(ABC):
@@ -27,9 +28,25 @@ class StringColumnSchemaFactory(ColumnSchemaFactory):
 
 
 SA_TYPE_MAPPING: dict[Any, ColumnSchemaFactory] = {
-    sa.Integer: SimpleColumnSchemaFactory(gb.Int),
+    sa.BigInteger: SimpleColumnSchemaFactory(gb.Int),  # TODO: max int
+    sa.Boolean: SimpleColumnSchemaFactory(gb.Bool),
     sa.Date: SimpleColumnSchemaFactory(gb.Date),
+    sa.DateTime: SimpleColumnSchemaFactory(gb.DateTime),
+    # sa.Enum: TODO
+    sa.Float: SimpleColumnSchemaFactory(gb.Float),
+    sa.Integer: SimpleColumnSchemaFactory(gb.Int),  # TODO: max int
+    # sa.Interval: TODO
+    # sa.LargeBinary: TODO
+    # sa.Numeric: TODO
+    # sa.Numeric: TODO
+    sa.SmallInteger: SimpleColumnSchemaFactory(gb.Int),  # TODO: max int
     sa.String: StringColumnSchemaFactory(),
+    sa.Text: SimpleColumnSchemaFactory(gb.Str),
+    # sa.Time: TODO
+    sa.Unicode: SimpleColumnSchemaFactory(gb.Str),
+    sa.UnicodeText: SimpleColumnSchemaFactory(gb.Str),
+    sa_pg.JSON: SimpleColumnSchemaFactory(gb.Dict),
+    sa_pg.JSONB: SimpleColumnSchemaFactory(gb.Dict),
 }
 
 
