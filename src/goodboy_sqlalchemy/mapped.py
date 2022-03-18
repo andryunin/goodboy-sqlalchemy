@@ -77,6 +77,7 @@ class Mapped(gb.Schema, gb.SchemaErrorMixin):
         self._mapped_keys = mapped_key_builder.build(
             sa_mapped_class, self._keys, messages
         )
+        self._mapped_key_names = [mk.name for mk in self._mapped_keys]
 
     def __call__(self, value, *, typecast=False, context: dict = {}):
         if not isinstance(context.get("session"), sa_orm.Session):
@@ -117,9 +118,10 @@ class Mapped(gb.Schema, gb.SchemaErrorMixin):
         unknown_keys = list(value.keys())
 
         instance = context.get("mapped_instance")
+        instance_proxy = MappedInstanceProxy(instance, self._mapped_key_names, value)
 
         for mapped_key in self._mapped_keys:
-            if not mapped_key.predicate_result(result):
+            if not mapped_key.predicate_result(instance_proxy):
                 continue
 
             if mapped_key.name in unknown_keys:
@@ -127,14 +129,18 @@ class Mapped(gb.Schema, gb.SchemaErrorMixin):
 
                 try:
                     key_value = mapped_key.validate(
-                        value[mapped_key.name], typecast, context, session, instance
+                        value[mapped_key.name],
+                        typecast,
+                        context,
+                        session,
+                        instance,
                     )
                 except gb.SchemaError as e:
                     value_errors[mapped_key.name] = e.errors
                 else:
                     result[mapped_key.name] = key_value
             else:
-                if mapped_key.required:
+                if mapped_key.required and instance is None:
                     key_errors[mapped_key.name] = [self._error("required_key")]
 
         errors: list[gb.Error] = []
