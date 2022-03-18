@@ -42,9 +42,11 @@ class Mapped(gb.Schema, gb.SchemaErrorMixin):
             )
 
         if not isinstance(value, dict):
-            return None, [
-                self._error("unexpected_type", {"expected_type": gb.type_name("dict")})
-            ]
+            error = self._error(
+                "unexpected_type", {"expected_type": gb.type_name("dict")}
+            )
+
+            raise gb.SchemaError([error])
 
         session: sa_orm.Session = context["session"]
         instance: Any = context.get("mapped_instance")
