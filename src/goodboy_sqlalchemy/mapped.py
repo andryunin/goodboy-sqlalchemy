@@ -85,7 +85,7 @@ class Mapped(gb.Schema, gb.SchemaErrorMixin):
         self._mapped_key_names = [mk.name for mk in self._mapped_keys]
 
     def __call__(self, value, *, typecast=False, context: dict = {}):
-        if not isinstance(context.get("session"), sa_orm.Session):
+        if not context.get("session"):
             raise MappedError(
                 "session instance is required in Mapped validation context"
             )
