@@ -4,6 +4,7 @@ import goodboy as gb
 import pytest
 import sqlalchemy as sa
 
+from goodboy_sqlalchemy.column import Column
 from goodboy_sqlalchemy.mapped import Mapped
 from tests.conftest import (
     assert_dict_key_errors,
@@ -21,6 +22,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String)
 
 
 Base.metadata.create_all(engine)
@@ -149,3 +151,15 @@ def test_rejects_values_when_conditional_validation_failed(
         {"val": [gb.Error("unexpected_type", {"expected_type": type_name})]}
     ):
         schema(bad_value, context=context)
+
+
+def test_replaces_column_name_with_(context):
+    schema = Mapped(
+        User,
+        keys=[
+            Column("nickname", gb.Str(allow_none=True), mapped_column_name="name"),
+        ],
+    )
+
+    assert schema({"nickname": "Marty"}, context=context) == {"name": "Marty"}
+    assert schema({"nickname": None}, context=context) == {"name": None}

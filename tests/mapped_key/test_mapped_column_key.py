@@ -33,14 +33,22 @@ def session():
 
 def test_inherits_column_properties():
     name = "my_name"
+    mapped_column_name = "my_name_mapped"
     required = False
     predicate_res = False
 
-    column = Column(name, Str(), required=required, predicate=lambda _: predicate_res)
+    column = Column(
+        name,
+        Str(),
+        required=required,
+        predicate=lambda _: predicate_res,
+        mapped_column_name=mapped_column_name,
+    )
 
     mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
 
     assert mapped_column.name is name
+    assert mapped_column.result_key_name is mapped_column_name
     assert mapped_column.required is required
     assert mapped_column.predicate_result({}) is predicate_res
 

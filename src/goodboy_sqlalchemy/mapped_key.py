@@ -17,6 +17,10 @@ class MappedKey(ABC):
         ...
 
     @abstractproperty
+    def result_key_name(self):
+        ...
+
+    @abstractproperty
     def required(self):
         ...
 
@@ -54,6 +58,10 @@ class MappedColumnKey(MappedKey):
     @property
     def name(self):
         return self._column.name
+
+    @property
+    def result_key_name(self):
+        return self._column.mapped_column_name
 
     @property
     def required(self):
@@ -105,6 +113,10 @@ class MappedPropertyKey(MappedKey):
         return self._key.name
 
     @property
+    def result_key_name(self):
+        return self._key.name
+
+    @property
     def required(self):
         return self._key.required
 
@@ -152,7 +164,7 @@ class MappedKeyBuilder:
         if isinstance(key, Column):
             return MappedColumnKey(
                 sa_mapped_class,
-                self._get_sa_column(sa_mapped_class, key.name),
+                self._get_sa_column(sa_mapped_class, key.mapped_column_name),
                 self._get_pk_sa_column(sa_mapped_class),
                 key,
                 messages,

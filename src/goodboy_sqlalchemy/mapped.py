@@ -143,7 +143,7 @@ class Mapped(gb.Schema, gb.SchemaErrorMixin):
                 except gb.SchemaError as e:
                     value_errors[mapped_key.name] = e.errors
                 else:
-                    result[mapped_key.name] = key_value
+                    result[mapped_key.result_key_name] = key_value
             else:
                 if mapped_key.required and instance is None:
                     key_errors[mapped_key.name] = [self._error("required_key")]

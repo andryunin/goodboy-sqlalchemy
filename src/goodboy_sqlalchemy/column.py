@@ -14,11 +14,14 @@ class Column(gb.Key):
         name: str,
         schema: Optional[gb.Schema] = None,
         *,
+        mapped_column_name: Optional[str] = None,
         required: Optional[bool] = None,
         predicate: Optional[Callable[[dict], bool]] = None,
         unique: bool = False,
     ):
         super().__init__(name, schema, required=required, predicate=predicate)
+
+        self.mapped_column_name = mapped_column_name or name
         self.unique = unique
 
     def with_predicate(self, predicate: Callable[[dict], bool]) -> Column:
