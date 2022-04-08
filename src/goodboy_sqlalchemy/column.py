@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 import goodboy as gb
 import sqlalchemy as sa
@@ -16,11 +16,23 @@ class Column(gb.Key):
         *,
         mapped_column_name: Optional[str] = None,
         required: Optional[bool] = None,
+        default: Optional[Any] = None,
+        has_default: bool = False,
         predicate: Optional[Callable[[dict], bool]] = None,
         unique: bool = False,
     ):
-        super().__init__(name, schema, required=required, predicate=predicate)
+        super().__init__(
+            name, schema, required=required, default=default, predicate=predicate
+        )
 
+        if default is not None:
+            has_default = True
+
+        if has_default and required:
+            raise ValueError("key with default value cannot be required")
+
+        self.has_default = has_default
+        self.default = default
         self.mapped_column_name = mapped_column_name or name
         self.unique = unique
 
@@ -29,6 +41,7 @@ class Column(gb.Key):
             self.name,
             self._schema,
             required=self.required,
+            default=self.default,
             predicate=predicate,
             unique=self.unique,
         )
@@ -66,10 +79,21 @@ class ColumnBuilder:
         sa_column = sa_mapper.columns[column_name]
         schema = self._column_schema_builder.build(sa_column)
 
+        has_default = bool(sa_column.default or sa_column.server_default)
+
+        if sa_column.default and sa_column.default.is_scalar:
+            default = sa_column.default.arg
+        else:
+            default = None
+
+        required = not (has_default or sa_column.nullable)
+
         return Column(
             sa_column.name,
             schema,
-            required=not sa_column.nullable,
+            required=required,
+            has_default=has_default,
+            default=default,
             unique=sa_column.unique or False,
         )
 

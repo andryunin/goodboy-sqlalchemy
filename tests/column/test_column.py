@@ -33,3 +33,11 @@ def test_equality_check():
     column_2 = Column("dummy", Int(), required=True)
 
     assert column_1 == column_2
+
+
+def test_column_cannot_be_required_and_has_default():
+    with pytest.raises(ValueError):
+        Column("dummy", Int(), required=True, default=0)
+
+    with pytest.raises(ValueError):
+        Column("dummy", Int(), required=True, has_default=True)

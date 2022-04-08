@@ -15,6 +15,8 @@ class Dummy(Base):
 
     field_1 = sa.Column(sa.String, nullable=False, unique=True)
     field_2 = sa.Column(sa.String)
+    field_3 = sa.Column(sa.String, default="val")
+    field_4 = sa.Column(sa.String, server_default="val")
 
 
 @pytest.fixture
@@ -27,6 +29,30 @@ def test_builds_columns(column_builder: ColumnBuilder):
         Column("field_1", gb.Str(), required=True, unique=True),
         Column("field_2", gb.Str(allow_none=True), required=False, unique=False),
     ]
+
+
+def test_handles_default_value(column_builder: ColumnBuilder):
+    column = Column(
+        "field_3",
+        gb.Str(allow_none=True),
+        required=False,
+        unique=False,
+        default="val",
+    )
+
+    assert column_builder.build(Dummy, ["field_3"]) == [column]
+
+
+def test_handles_server_default_value(column_builder: ColumnBuilder):
+    column = Column(
+        "field_4",
+        gb.Str(allow_none=True),
+        required=False,
+        unique=False,
+        has_default=True,
+    )
+
+    assert column_builder.build(Dummy, ["field_4"]) == [column]
 
 
 def test_raises_error_when_column_not_found(column_builder: ColumnBuilder):
