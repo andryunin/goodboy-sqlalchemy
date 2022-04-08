@@ -98,6 +98,17 @@ def test_rejects_bad_value_with_instance(user_mapped, session):
         user_mapped({"name": None}, context=context)
 
 
+def test_ignores_required_key_on_update(user_mapped, session):
+    user = User(name="Marty")
+
+    session.add(user)
+    session.flush()
+
+    context = {"session": session, "mapped_instance": user}
+
+    user_mapped({}, context=context) == {}
+
+
 def test_rejects_non_unique_value_of_new_mapped_instance(user_mapped, session):
     session.add(User(name="Marty"))
     session.flush()

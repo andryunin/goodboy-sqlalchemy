@@ -86,6 +86,16 @@ def test_rejects_unknown_key(context):
         schema({"oops": True}, context=context)
 
 
+def test_default_value_for_absent_key(context):
+    schema = Mapped(User, keys=[gb.Key("default_key", default="yeah")])
+    assert schema({}, context=context) == {"default_key": "yeah"}
+
+
+def test_ignores_default_value_for_present_key_with_none_value(context):
+    schema = Mapped(User, keys=[gb.Key("default_key", default="foo")])
+    assert schema({"default_key": None}, context=context) == {"default_key": None}
+
+
 def test_passes_typecast_flag_to_key_schemas(context):
     mapped = Mapped(User, keys=[gb.Key("date", gb.Date())])
 
