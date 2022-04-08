@@ -69,7 +69,7 @@ typing-extensions = {version = ">=4.0", markers = "python_version >= \"3.6\" and
 type = "git"
 url = "https://github.com/andryunin/goodboy"
 reference = "main"
-resolved_reference = "e12e664780af25591ffe293a41d07882c495951e"
+resolved_reference = "f0da5e25687942d9fcd96b31ff8d225be177eac8"
 
 [[package]]
 name = "greenlet"
