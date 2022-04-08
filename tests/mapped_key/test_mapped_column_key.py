@@ -36,6 +36,7 @@ def test_inherits_column_properties():
     mapped_column_name = "my_name_mapped"
     required = False
     predicate_res = False
+    default = "hello"
 
     column = Column(
         name,
@@ -43,6 +44,7 @@ def test_inherits_column_properties():
         required=required,
         predicate=lambda _: predicate_res,
         mapped_column_name=mapped_column_name,
+        default="hello",
     )
 
     mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
@@ -50,6 +52,8 @@ def test_inherits_column_properties():
     assert mapped_column.name is name
     assert mapped_column.result_key_name is mapped_column_name
     assert mapped_column.required is required
+    assert mapped_column.default == default
+    assert mapped_column.has_default
     assert mapped_column.predicate_result({}) is predicate_res
 
 

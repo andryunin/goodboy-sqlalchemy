@@ -24,6 +24,14 @@ class MappedKey(ABC):
     def required(self):
         ...
 
+    @abstractproperty
+    def has_default(self) -> bool:
+        ...
+
+    @abstractproperty
+    def default(self) -> Any:
+        ...
+
     @abstractmethod
     def predicate_result(self, prev_values: Mapping[str, Any]) -> bool:
         ...
@@ -66,6 +74,14 @@ class MappedColumnKey(MappedKey):
     @property
     def required(self):
         return self._column.required
+
+    @property
+    def has_default(self) -> bool:
+        return self._column.has_default
+
+    @property
+    def default(self) -> Any:
+        return self._column.default
 
     def predicate_result(self, prev_values: Mapping[str, Any]) -> bool:
         return self._column.predicate_result(prev_values)
@@ -122,6 +138,14 @@ class MappedPropertyKey(MappedKey):
 
     def predicate_result(self, prev_values: Mapping[str, Any]) -> bool:
         return self._key.predicate_result(prev_values)
+
+    @property
+    def has_default(self) -> bool:
+        return self._key.default is not None
+
+    @property
+    def default(self) -> Any:
+        return self._key.default
 
     def validate(
         self,
