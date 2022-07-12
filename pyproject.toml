@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "goodboy-sqlalchemy"
-version = "0.1.0"
+version = "0.2.1"
 description = "Data validation tool for SQLALchemy"
 license = "MIT"
 authors = ["Maxim Andryunin <maxim.andryunin@gmail.com>"]

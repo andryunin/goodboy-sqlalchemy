@@ -12,7 +12,7 @@ from goodboy_sqlalchemy.mapped import (
 )
 from goodboy_sqlalchemy.messages import DEFAULT_MESSAGES
 
-__version__ = "0.1.0"
+__version__ = "0.2.1"
 
 __all__ = [
     "column_schema_builder",
