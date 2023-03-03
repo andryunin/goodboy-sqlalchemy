@@ -17,6 +17,7 @@ class Dummy(Base):
     field_2 = sa.Column(sa.String)
     field_3 = sa.Column(sa.String, default="val")
     field_4 = sa.Column(sa.String, server_default="val")
+    field_5 = sa.Column("field_5_in_database", sa.String)
 
 
 @pytest.fixture
@@ -24,10 +25,18 @@ def column_builder():
     return ColumnBuilder(column_schema_builder)
 
 
-def test_builds_columns(column_builder: ColumnBuilder):
+def test_builds_simple_columns(column_builder: ColumnBuilder):
     assert column_builder.build(Dummy, ["field_1", "field_2"]) == [
         Column("field_1", gb.Str(), required=True, unique=True),
         Column("field_2", gb.Str(allow_none=True), required=False, unique=False),
+    ]
+
+
+def test_builds_renamed_columns(column_builder: ColumnBuilder):
+    print(column_builder.build(Dummy, ["field_5"])[0])
+    print(column_builder.build(Dummy, ["field_5"])[0].__dict__)
+    assert column_builder.build(Dummy, ["field_5"]) == [
+        Column("field_5", gb.Str(allow_none=True), required=False, unique=False),
     ]
 
 

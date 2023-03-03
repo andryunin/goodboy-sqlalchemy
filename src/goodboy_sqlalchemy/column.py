@@ -89,7 +89,7 @@ class ColumnBuilder:
         required = not (has_default or sa_column.nullable)
 
         return Column(
-            sa_column.name,
+            column_name,
             schema,
             required=required,
             has_default=has_default,
