@@ -100,7 +100,7 @@ class MappedColumnKey(MappedKey):
             query = sa_orm.Query(self._sa_mapped_class).filter(self._sa_column == value)
 
             if instance:
-                instance_pk = getattr(instance, self._sa_pk_column.name)
+                instance_pk = getattr(instance, self._sa_pk_column.key)
                 query = query.filter(self._sa_pk_column != instance_pk)
 
             exists = session.query(query.exists()).scalar()
