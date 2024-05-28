@@ -13,28 +13,22 @@ from goodboy_sqlalchemy.messages import DEFAULT_MESSAGES
 
 class MappedKey(ABC):
     @abstractproperty
-    def name(self):
-        ...
+    def name(self): ...
 
     @abstractproperty
-    def result_key_name(self):
-        ...
+    def result_key_name(self): ...
 
     @abstractproperty
-    def required(self):
-        ...
+    def required(self): ...
 
     @abstractproperty
-    def has_default(self) -> bool:
-        ...
+    def has_default(self) -> bool: ...
 
     @abstractproperty
-    def default(self) -> Any:
-        ...
+    def default(self) -> Any: ...
 
     @abstractmethod
-    def predicate_result(self, prev_values: Mapping[str, Any]) -> bool:
-        ...
+    def predicate_result(self, prev_values: Mapping[str, Any]) -> bool: ...
 
     @abstractmethod
     def validate(
@@ -44,8 +38,7 @@ class MappedKey(ABC):
         context: dict,
         session: sa_orm.Session,
         instance: Optional[Any] = None,
-    ):
-        ...
+    ): ...
 
 
 class MappedColumnKey(MappedKey):
@@ -54,12 +47,14 @@ class MappedColumnKey(MappedKey):
         sa_mapped_class: type,
         sa_column: sa.Column,
         sa_pk_column: sa.Column,
+        sa_pk_column_property_name: str,
         column: Column,
         messages: gb.MessageCollectionType = DEFAULT_MESSAGES,
     ):
         self._sa_mapped_class = sa_mapped_class
         self._sa_column = sa_column
         self._sa_pk_column = sa_pk_column
+        self._sa_pk_column_property_name = sa_pk_column_property_name
         self._column = column
         self._messages = messages
 
@@ -100,7 +95,7 @@ class MappedColumnKey(MappedKey):
             query = sa_orm.Query(self._sa_mapped_class).filter(self._sa_column == value)
 
             if instance:
-                instance_pk = getattr(instance, self._sa_pk_column.key)
+                instance_pk = getattr(instance, self._sa_pk_column_property_name)
                 query = query.filter(self._sa_pk_column != instance_pk)
 
             exists = session.query(query.exists()).scalar()
@@ -186,10 +181,15 @@ class MappedKeyBuilder:
         self, sa_mapped_class: type, key: gb.Key, messages: gb.MessageCollectionType
     ) -> MappedKey:
         if isinstance(key, Column):
+            pk_column, pk_property_name = self._get_pk_sa_column_and_property_name(
+                sa_mapped_class
+            )
+
             return MappedColumnKey(
                 sa_mapped_class,
                 self._get_sa_column(sa_mapped_class, key.mapped_column_name),
-                self._get_pk_sa_column(sa_mapped_class),
+                pk_column,
+                pk_property_name,
                 key,
                 messages,
             )
@@ -206,7 +206,9 @@ class MappedKeyBuilder:
 
         return sa_mapper.columns[column_name]
 
-    def _get_pk_sa_column(self, sa_mapped_class: type) -> sa.Column:
+    def _get_pk_sa_column_and_property_name(
+        self, sa_mapped_class: type
+    ) -> tuple[sa.Column, str]:
         sa_mapper = sa.inspect(sa_mapped_class)
 
         if len(sa_mapper.primary_key) > 1:
@@ -214,7 +216,13 @@ class MappedKeyBuilder:
                 "mapped classes with composite primary keys are not supported"
             )
 
-        return sa_mapper.primary_key[0]
+        for column_property_name, column in sa_mapper.columns.items():
+            if column.primary_key:
+                return column, column_property_name
+        else:
+            raise MappedKeyBuilderError(
+                "mapped classes with has no primary keys column"
+            )
 
 
 mapped_key_builder = MappedKeyBuilder()

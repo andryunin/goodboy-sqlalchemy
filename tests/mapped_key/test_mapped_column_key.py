@@ -47,7 +47,7 @@ def test_inherits_column_properties():
         default="hello",
     )
 
-    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
+    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, "id", column)
 
     assert mapped_column.name is name
     assert mapped_column.result_key_name is mapped_column_name
@@ -59,7 +59,7 @@ def test_inherits_column_properties():
 
 def test_accepts_unique_value(session):
     column = Column("name", Str(), required=True, unique=True)
-    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
+    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, "id", column)
 
     assert mapped_column.validate("ok", False, {}, session) == "ok"
 
@@ -69,7 +69,7 @@ def test_rejects_non_unique_value_of_new_mapped_instance(session):
     session.flush()
 
     column = Column("name", Str(), required=True, unique=True)
-    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
+    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, "id", column)
 
     with assert_errors([Error("already_exists")]):
         mapped_column.validate("old", False, {}, session)
@@ -81,6 +81,6 @@ def test_accepts_non_unique_value_of_old_mapped_instance(session):
     session.flush()
 
     column = Column("name", Str(), required=True, unique=True)
-    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, column)
+    mapped_column = MappedColumnKey(Dummy, Dummy.name, Dummy.id, "id", column)
 
     assert mapped_column.validate("old", False, {}, session, dummy) == "old"

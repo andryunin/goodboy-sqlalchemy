@@ -35,8 +35,12 @@ def test_builds_mapped_column_keys(mapped_key_builder: MappedKeyBuilder):
     ]
 
     assert mapped_key_builder.build(Dummy, keys) == [
-        MappedColumnKey(Dummy, Dummy.field_1, Dummy.id, keys[0], DEFAULT_MESSAGES),
-        MappedColumnKey(Dummy, Dummy.field_2, Dummy.id, keys[1], DEFAULT_MESSAGES),
+        MappedColumnKey(
+            Dummy, Dummy.field_1, Dummy.id, "id", keys[0], DEFAULT_MESSAGES
+        ),
+        MappedColumnKey(
+            Dummy, Dummy.field_2, Dummy.id, "id", keys[1], DEFAULT_MESSAGES
+        ),
     ]
 
 
