@@ -44,7 +44,7 @@ jobs:
         python -m poetry config virtualenvs.in-project true
 
     - name: Set up dependencies cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: .venv
         key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('poetry.lock') }}
