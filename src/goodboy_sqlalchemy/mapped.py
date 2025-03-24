@@ -4,6 +4,7 @@ from typing import Any, Mapping, Optional
 
 import goodboy as gb
 import sqlalchemy.orm as sa_orm
+from goodboy.schema import Rule
 
 from goodboy_sqlalchemy.column import ColumnBuilder, column_builder
 from goodboy_sqlalchemy.mapped_key import MappedKeyBuilder, mapped_key_builder
@@ -63,7 +64,7 @@ class MappedError(Exception):
     pass
 
 
-class Mapped(gb.Schema, gb.SchemaErrorMixin):
+class Mapped(gb.Schema, gb.SchemaErrorMixin, gb.SchemaRulesMixin):
     def __init__(
         self,
         sa_mapped_class: type,
@@ -72,11 +73,13 @@ class Mapped(gb.Schema, gb.SchemaErrorMixin):
         column_builder: ColumnBuilder = column_builder,
         mapped_key_builder: MappedKeyBuilder = mapped_key_builder,
         messages: gb.MessageCollectionType = DEFAULT_MESSAGES,
+        rules: list[Rule] = [],
     ):
         super().__init__()
 
         self._sa_mapped_class = sa_mapped_class
         self._messages = messages
+        self._rules = rules
 
         self._keys = keys + column_builder.build(sa_mapped_class, column_names)
         self._mapped_keys = mapped_key_builder.build(
@@ -161,4 +164,21 @@ class Mapped(gb.Schema, gb.SchemaErrorMixin):
         if value_errors:
             errors.append(self._error("value_errors", nested_errors=value_errors))
 
+        result, rule_errors = self._call_rules(result.copy(), typecast, context)
+
+        self._merge_rule_errors(rule_errors, errors)
+
         return result, errors
+
+    def _merge_rule_errors(self, rule_errors: list[gb.Error], to: list[gb.Error]):
+        for rule_error in rule_errors:
+            if rule_error.code not in ["key_errors", "value_errors"]:
+                to.append(rule_error)
+                continue
+
+            for to_error in to:
+                if to_error.code == rule_error.code:
+                    to_error.merge_nested_errors(rule_error.nested_errors)
+                    break
+            else:
+                to.append(rule_error)

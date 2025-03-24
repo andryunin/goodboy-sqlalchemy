@@ -173,3 +173,48 @@ def test_replaces_column_name_with_(context):
 
     assert schema({"nickname": "Marty"}, context=context) == {"name": "Marty"}
     assert schema({"nickname": None}, context=context) == {"name": None}
+
+
+def test_merges_value_errors_from_rule_errors(context):
+    schema = Mapped(
+        User,
+        rules=[rule_with_value_errors],
+        keys=[
+            Column(
+                "nickname", gb.Str(allowed=["Marty", "Doc"]), mapped_column_name="name"
+            ),
+        ],
+    )
+
+    with assert_errors(
+        [
+            gb.Error(
+                "value_errors",
+                nested_errors={
+                    "nickname": [
+                        gb.Error("not_allowed", {"allowed": ["Marty", "Doc"]}),
+                        gb.Error("value_error_from_rule"),
+                    ],
+                },
+            )
+        ]
+    ):
+        schema({"nickname": "Rick"}, context=context)
+
+
+def rule_with_key_errors(self: Mapped, value, typecast: bool, context: dict):
+    return value, [
+        self._error(
+            "key_errors",
+            nested_errors={"nickname": [self._error("key_error_from_rule")]},
+        )
+    ]
+
+
+def rule_with_value_errors(self: Mapped, value, typecast: bool, context: dict):
+    return value, [
+        self._error(
+            "value_errors",
+            nested_errors={"nickname": [self._error("value_error_from_rule")]},
+        ),
+    ]
